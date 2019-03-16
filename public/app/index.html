@@ -1,0 +1,147 @@
+<style type="text/css">
+  .container {
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+    flex-wrap: wrap;
+
+    border-color: black;
+    border-style: solid;
+    border-width: 5px;
+  }
+
+  .item {
+    flex-basis: 18px;
+
+    width: 18px;
+    height: 18px;
+    border-color: black;
+    border-style: solid;
+    border-width: 1px;
+  }
+
+  .pressed {
+    background-color: lightgray;
+  }
+
+  .unpressed {
+    background-color: gray;
+  }
+
+  .unpressed {
+    background-color: gray;
+  }
+
+  .coordinate {
+    width: 2rem;
+  }
+</style>
+
+<input class="coordinate" type="text" id="newBoardXSize" placeholder="x"/>
+<input class="coordinate" type="text" id="newBoardYSize" placeholder="y"/>
+<button id="new-game">New</button>
+
+<button id="fetch-board">Show Last</button>
+
+<div id="board" class="container">
+  <div class="item"></div>
+  <div class="item"></div>
+  <div class="item"></div>
+  <div class="item"></div>
+</div>
+
+
+<script type="text/javascript">
+  const SQURAE_SIZE = 20;
+  let gameEnded = false;
+
+  function press(x,y,div) {
+    return function(event) {
+      const xhttp = new XMLHttpRequest();
+
+      xhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+          drawBoard(this.responseText);
+        }
+      }
+
+      xhttp.open("POST", "http://localhost:3000/games/1/play", true);
+      xhttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+      xhttp.send("x="+x+"&y="+y);
+    }
+  }
+
+  function drawSquare(board, x, y, tile) {
+    const newDiv = document.createElement("div");
+    newDiv.classList.add("item");
+
+    if (tile == "?") {
+      newDiv.classList.add("unpressed");
+
+      if (!gameEnded) {
+        newDiv.addEventListener("click", press(x,y,newDiv));
+      }
+    } else {
+      newDiv.classList.add("pressed");
+
+      if (tile > 0) {
+        const text = document.createTextNode(tile);
+        newDiv.appendChild(text);
+      }
+    }
+
+    board.appendChild(newDiv);
+  }
+
+  function drawBoard(game) {
+    game = JSON.parse(game);
+    const xSize = game["x_size"];
+    const ySize = game["y_size"];
+    const cells = game["cells"];
+    const board = document.getElementById("board");
+
+    board.style.width  = (SQURAE_SIZE * xSize) + "px";
+    board.style.height = (SQURAE_SIZE * ySize) + "px";
+
+    board.innerHTML = '';
+
+    gameEnded = board["state"] == "ended";
+
+    for (let y = 0; y < ySize; y++) {
+      for (let x = 0; x < xSize; x++) {
+        drawSquare(board, x, y, cells[x][y]);
+      }
+    }
+  }
+
+  function renderGame() {
+    var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function() {
+      if (this.readyState == 4 && this.status == 200) {
+        drawBoard(this.responseText);
+      }
+    };
+
+    xhttp.open("GET", "http://localhost:3000/games/1", true);
+    xhttp.send();
+  }
+
+  function newGame() {
+    const x = document.getElementById("newBoardXSize").value;
+    const y = document.getElementById("newBoardYSize").value;
+
+    var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function() {
+      if (this.readyState == 4 && this.status == 200) {
+        drawBoard(this.responseText);
+      }
+    };
+
+    xhttp.open("GET", "http://localhost:3000/games/1", true);
+    xhttp.send();
+  }
+
+  document.getElementById("fetch-board").addEventListener("click", renderGame);
+  document.getElementById("new-game").addEventListener("click", newGame);
+  renderGame();
+</script>
