@@ -1,23 +1,33 @@
 class GamesController < ApplicationController
   def show
-    game = Game.find params[:id]
-    render json: game
-  end
-
-  def play
-    game = Game.find params[:game_id]
-    game_continues = game.pressed params[:x].to_i.next, params[:y].to_i.next
-
-    game.reload
-
-    render json: game
+    render json: Game.find(params[:id])
   end
 
   def create
     game = Game.create user_id: User.first.id,
-                       state: :created,
-                       x_size: params[:x_size],
-                       y_size: params[:y_size]
+                       width: params[:width],
+                       height: params[:height],
+                       bomb_amount: params[:bomb_amount]
+
+    render json: game
+  end
+
+  def play
+    x = params[:x].to_i
+    y = params[:y].to_i
+    game = Game.find params[:game_id]
+    game_continues = game.press(x, y)
+    game.save
+
+    render json: game
+  end
+
+  def flag
+    x = params[:x].to_i
+    y = params[:y].to_i
+    game = Game.find params[:game_id]
+    game.flag(x, y)
+    game.save
 
     render json: game
   end

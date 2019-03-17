@@ -4,5 +4,6 @@ Rails.application.routes.draw do
 
   resources :games, only: [:show, :create] do
     post 'play', to: 'games#play'
+    post 'flag', to: 'games#flag'
   end
 end
