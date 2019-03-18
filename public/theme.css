@@ -1,0 +1,63 @@
+#board {
+  /* Variables */
+  --cell-total-size: 30px;
+  --cell-border: 1px;
+  --cell-inner-size: calc(var(--cell-total-size) - calc(2 * var(--cell-border)));
+
+  /* Flow for drawing cells */
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: row;
+  flex-wrap: wrap;
+
+  /* Simple & ugly style */
+  border-color: black;
+  border-style: solid;
+  border-width: 5px;
+}
+
+.item {
+  text-align: center;
+  font-weight: bold;
+  flex-basis: var(--cell-inner-size);
+
+  width: var(--cell-inner-size);
+  height: var(--cell-inner-size);
+  border-color: black;
+  border-style: solid;
+  border-width: var(--cell-border);
+}
+
+.pressed {
+  background-color: lightgray;
+}
+
+.unpressed {
+  background-color: gray;
+  border-top-color: white;
+  border-left-color: white;
+}
+
+.coordinate {
+  width: 2rem;
+}
+
+.pressed-1 {
+  color: blue;
+}
+
+.pressed-2 {
+  color: green;
+}
+
+.pressed-3 {
+  color: red;
+}
+
+.flag {
+  color: red;
+}
+
+.boom {
+  background-color: red;
+}

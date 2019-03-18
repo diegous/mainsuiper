@@ -1,7 +1,7 @@
 class Game < ApplicationRecord
   belongs_to :user
 
-  enum state: [:created, :started, :ended]
+  enum state: [:created, :started, :won, :lost]
 
   validate :too_many_bombs
 
@@ -31,24 +31,44 @@ class Game < ApplicationRecord
   end
 
   def board
+    value_of = "value_of_#{state}"
+
     self.cells.each_with_index.map do |row, x|
       row.each_with_index.map do |cell, y|
-        if pressed[x][y]
-          if bombs[x][y]
-            'B'
-          else
-            cell
-          end
-        elsif flags[x][y]
-          'F'
-        else
-          '?'
-        end
+        {
+          x: x,
+          y: y,
+          value: send(value_of, cell, x, y)
+        }
       end
-    end
+    end.flatten
   end
 
   private
+
+  def value_of_won(value, x, y)
+    bombs[x][y] ? 'flag' : value
+  end
+
+  def value_of_lost(value, x, y)
+    if pressed[x][y]
+      bombs[x][y] ? 'BOOM' : value
+    elsif flags[x][y]
+      bombs[x][y] ? 'flag' : 'wrong flag'
+    else
+      bombs[x][y] ? 'bomb' : value
+    end
+  end
+
+  def value_of_started(value, x, y)
+    if pressed[x][y]
+      value
+    elsif flags[x][y]
+      'flag'
+    else
+      '?'
+    end
+  end
 
   def generate_bombs(clicked_x, clicked_y)
     # create bombs at random spots, but not on cliked cell
