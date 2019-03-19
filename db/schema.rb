@@ -21,10 +21,7 @@ ActiveRecord::Schema.define(version: 2019_03_12_225218) do
     t.integer "width"
     t.integer "height"
     t.integer "bomb_amount"
-    t.integer "cells", array: true
-    t.boolean "bombs", array: true
-    t.boolean "flags", array: true
-    t.boolean "pressed", array: true
+    t.jsonb "cells", array: true
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["user_id"], name: "index_games_on_user_id"

@@ -8,10 +8,8 @@ class Game < ApplicationRecord
   before_create :set_created
 
   def start(x, y)
-    self.cells   = Array.new(width) { Array.new height, 0 }
-    self.bombs   = Array.new(width) { Array.new height, false }
-    self.flags   = Array.new(width) { Array.new height, false }
-    self.pressed = Array.new(width) { Array.new height, false }
+    self.state = :started
+    self.cells = Array.new(width) { Array.new height, { 'near_bombs' => 0 } }
 
     generate_bombs(x,y)
     calculate_numbers
@@ -20,14 +18,16 @@ class Game < ApplicationRecord
   end
 
   def press(x,y)
-    self.pressed[x][y] = true
-    flood_neighbors(x,y) if self.cells[x][y].zero?
+    cell = self.cells[x][y]
+    cell['pressed'] = true
+    flood_neighbors(x,y) if cell['near_bombs'].zero?
+    self.state = :lost if cell['bomb']
 
-    bombs[x][y]
+    !!cell['bomb']
   end
 
   def flag(x,y)
-    self.flags[x][y] = !self.flags[x][y]
+    self.cells[x][y]['flagged'] = !self.cells[x][y]['flagged']
   end
 
   def board
@@ -38,7 +38,7 @@ class Game < ApplicationRecord
         {
           x: x,
           y: y,
-          value: send(value_of, cell, x, y)
+          value: send(value_of, cell)
         }
       end
     end.flatten
@@ -46,24 +46,24 @@ class Game < ApplicationRecord
 
   private
 
-  def value_of_won(value, x, y)
-    bombs[x][y] ? 'flag' : value
+  def value_of_won(cell)
+    cell['bomb'] ? 'flag' : cell['near_bombs']
   end
 
-  def value_of_lost(value, x, y)
-    if pressed[x][y]
-      bombs[x][y] ? 'BOOM' : value
-    elsif flags[x][y]
-      bombs[x][y] ? 'flag' : 'wrong flag'
+  def value_of_lost(cell)
+    if cell['pressed']
+      cell['bomb'] ? 'BOOM' : cell['near_bombs']
+    elsif cell['flags']
+      cell['bomb'] ? 'flag' : 'wrong flag'
     else
-      bombs[x][y] ? 'bomb' : value
+      cell['bomb'] ? 'bomb' : cell['near_bombs']
     end
   end
 
-  def value_of_started(value, x, y)
-    if pressed[x][y]
-      value
-    elsif flags[x][y]
+  def value_of_started(cell)
+    if cell['pressed']
+      cell['near_bombs']
+    elsif cell['flagged']
       'flag'
     else
       '?'
@@ -72,24 +72,24 @@ class Game < ApplicationRecord
 
   def generate_bombs(clicked_x, clicked_y)
     # create bombs at random spots, but not on cliked cell
-    self.bombs[clicked_x][clicked_y] = true
+    self.cells[clicked_x][clicked_y]['bomb'] = true
 
     bomb_amount.times do
       begin
         x = rand width
         y = rand height
-      end while self.bombs[x][y]
+      end while self.cells[x][y]['bomb']
 
-      self.bombs[x][y] = true
+      self.cells[x][y]['bomb'] = true
     end
 
-    self.bombs[clicked_x][clicked_y] = false
+    self.cells[clicked_x][clicked_y]['bomb'] = false
   end
 
   def calculate_numbers
-    self.bombs.each_with_index do |row, x|
-      row.each_with_index do |bomb, y|
-        increment_neighbours_of(x,y) if bomb
+    self.cells.each_with_index do |row, x|
+      row.each_with_index do |cell, y|
+        increment_neighbours_of(x,y) if cell['bomb']
       end
     end
   end
@@ -98,17 +98,18 @@ class Game < ApplicationRecord
     neighbors = neighbors_of(x,y)
 
     neighbors.each do |x,y|
-      self.cells[x][y] += 1
+      self.cells[x][y]['near_bombs'] += 1
     end
   end
 
   def flood_neighbors(x,y)
     neighbors = neighbors_of(x,y)
 
-    neighbors.reject { |x,y| self.pressed[x][y]        }
-             .each   { |x,y| self.pressed[x][y] = true }
-             .select { |x,y| self.cells[x][y].zero?    }
-             .each   { |x,y| flood_neighbors(x,y)      }
+    neighbors.map    { |x,y|      [x, y, self.cells[x][y]] }
+             .reject { |x,y,cell| cell['pressed']          }
+             .each   { |x,y,cell| cell['pressed'] = true   }
+             .select { |x,y,cell| cell['near_bombs'].zero? }
+             .each   { |x,y,cell| flood_neighbors(x,y)     }
   end
 
   def neighbors_of(x,y)
@@ -136,11 +137,11 @@ class Game < ApplicationRecord
   end
 
   def set_created
-    state = :created
+    self.state = :created
   end
 
   def too_many_bombs
-    if bomb_amount >= (height * width)
+    if self.bomb_amount >= (self.height * self.width)
       errors.add :bomb_amount, "must be smaller than tiles amount"
     end
   end

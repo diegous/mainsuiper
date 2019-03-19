@@ -35,8 +35,23 @@ const findSquareSize = function() {
   return Number(size.slice(1, -2));
 }
 
-const clickCell = function() {
-  console.log(`hola desde x: ${this.dataset.x} y: ${this.dataset.y}`);
+const clickCell = async function() {
+  const response = await fetch("http://localhost:3000/games/1/play", {
+    method: "POST",
+    mode: "cors",
+    headers: {
+        "Content-Type": "application/json",
+        // "Content-Type": "application/x-www-form-urlencoded",
+    },
+    body: JSON.stringify({x: this.dataset.x, y: this.dataset.y}),
+  })
+
+  const game = await response.json();
+  const content = document.getElementById('page_container');
+  const board = drawBoard(game);
+
+  content.innerHTML = board;
+  addListeners();
 }
 
 const flagCell = function() {
@@ -44,14 +59,8 @@ const flagCell = function() {
   return false;
 }
 
-// const SQURAE_SIZE = findSquareSize();
-
-const Home = {
-  render: async () => {
-    const response = await fetch("http://localhost:3000/games/1");
-    const game = await response.json();
-
-    const view = `
+const drawBoard = (game) => {
+  return `
       <div id="board"
            onContextMenu="return false"
            data-width=${game.width}
@@ -59,20 +68,31 @@ const Home = {
         ${game.board.map(drawCell).join('')}
       </div>
     `
-    return view;
+}
+
+const addListeners = () => {
+  // Set board widh & height
+  const board = document.getElementById('board');
+  const size = findSquareSize();
+  board.style.setProperty('width',  `${ size * board.dataset.width  }px`);
+  board.style.setProperty('height', `${ size * board.dataset.height }px`);
+
+  // Add event listeners for clicks
+  document.querySelectorAll('.unpressed').forEach((cell) => {
+    cell.addEventListener('click', clickCell);
+    cell.addEventListener('contextmenu', flagCell);
+  });
+}
+
+const Home = {
+  render: async () => {
+    const response = await fetch("http://localhost:3000/games/1");
+    const game = await response.json();
+
+    return drawBoard(game);
   },
   afterRender: async () => {
-    // Set board widh & height
-    const board = document.getElementById('board');
-    const size = findSquareSize();
-    board.style.setProperty('width',  `${ size * board.dataset.width  }px`);
-    board.style.setProperty('height', `${ size * board.dataset.height }px`);
-
-    // Add event listeners for clicks
-    document.querySelectorAll('.unpressed').forEach((cell) => {
-      cell.addEventListener('click', clickCell);
-      cell.addEventListener('contextmenu', flagCell);
-    });
+    addListeners();
   }
 }
 

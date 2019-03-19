@@ -11,7 +11,6 @@ const router = async () => {
   const content = document.getElementById('page_container');
   const request = window.location.pathname;
   const page = routes[request];
-  console.log("about to load home");
 
   content.innerHTML = await page.render();
   await page.afterRender();

@@ -6,10 +6,7 @@ class CreateGames < ActiveRecord::Migration[5.2]
       t.integer :width
       t.integer :height
       t.integer :bomb_amount
-      t.integer :cells, array: true
-      t.boolean :bombs, array: true
-      t.boolean :flags, array: true
-      t.boolean :pressed, array: true
+      t.jsonb   :cells, array: true
 
       t.timestamps
     end
