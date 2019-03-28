@@ -14,18 +14,24 @@
   border-color: black;
   border-style: solid;
   border-width: 5px;
+
+  user-select: none;
 }
 
 .item {
-  text-align: center;
   font-weight: bold;
   flex-basis: var(--cell-inner-size);
 
   width: var(--cell-inner-size);
   height: var(--cell-inner-size);
+  border-width: var(--cell-border);
   border-color: black;
   border-style: solid;
-  border-width: var(--cell-border);
+
+  /* Show stuff inside the cell centered */
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .pressed {

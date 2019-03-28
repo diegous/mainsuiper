@@ -19,14 +19,22 @@ class Game < ApplicationRecord
 
   def press(x,y)
     cell = self.cells[x][y]
+    return if cell['pressed']
+    return if cell['flagged']
+
     cell['pressed'] = true
     flood_neighbors(x,y) if cell['near_bombs'].zero?
-    self.state = :lost if cell['bomb']
 
-    !!cell['bomb']
+    if cell['bomb']
+      self.state = :lost
+    else
+      check_state
+    end
   end
 
   def flag(x,y)
+    return if self.cells[x][y]['pressed']
+
     self.cells[x][y]['flagged'] = !self.cells[x][y]['flagged']
   end
 
@@ -56,7 +64,7 @@ class Game < ApplicationRecord
     elsif cell['flags']
       cell['bomb'] ? 'flag' : 'wrong flag'
     else
-      cell['bomb'] ? 'bomb' : cell['near_bombs']
+      cell['bomb'] ? 'bomb' : '?'
     end
   end
 
@@ -134,6 +142,24 @@ class Game < ApplicationRecord
     end
 
     neighbors
+  end
+
+  def check_state
+    # No bombs pressed
+    bomb_pressed = cells.flatten
+                        .select { |cell| cell['bomb'] }
+                        .any? { |cell| cell['pressed'] }
+
+    if bomb_pressed
+      self.state = :lost
+    else
+      # Only bombs remain unpressed
+      only_bombs = cells.flatten
+                        .reject { |cell| cell['pressed'] }
+                        .none? { |cell| cell['bomb'] }
+
+      self.state = :won if only_bombs
+    end
   end
 
   def set_created

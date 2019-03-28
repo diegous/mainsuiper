@@ -1,4 +1,6 @@
 class GamesController < ApplicationController
+  before_action :authenticate_user!
+
   def show
     render json: Game.find(params[:id])
   end
@@ -13,22 +15,30 @@ class GamesController < ApplicationController
   end
 
   def play
-    x = params[:x].to_i
-    y = params[:y].to_i
-    game = Game.find params[:game_id]
-    game_continues = game.press(x, y)
+    game.press(x, y)
     game.save
 
     render json: game
   end
 
   def flag
-    x = params[:x].to_i
-    y = params[:y].to_i
-    game = Game.find params[:game_id]
     game.flag(x, y)
     game.save
 
     render json: game
+  end
+
+  private
+
+  def game
+    @game ||= Game.find params[:id]
+  end
+
+  def x
+    @x ||= params[:x].to_i
+  end
+
+  def y
+    @y ||= params[:y].to_i
   end
 end

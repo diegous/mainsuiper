@@ -1,10 +1,13 @@
+import Utils from '../../services/Utils.js';
+import API   from '../../services/Api.js';
+
 const drawCell = (cell) => {
-  let content = '',
-      classes;
+  let content, classes;
 
   switch(cell.value) {
     case '?':
       classes = 'unpressed';
+      content = '';
       break;
     case 'flag':
       classes = 'unpressed flag';
@@ -29,70 +32,64 @@ const drawCell = (cell) => {
   return `<span class="item ${classes}" ${datas}>${content}</span>`;
 }
 
-const findSquareSize = function() {
-  const board = document.getElementById('board');
-  let size = window.getComputedStyle(board).getPropertyValue('--cell-total-size');
-  return Number(size.slice(1, -2));
-}
 
-const clickCell = async function() {
-  const response = await fetch("http://localhost:3000/games/1/play", {
-    method: "POST",
-    mode: "cors",
-    headers: {
-        "Content-Type": "application/json",
-        // "Content-Type": "application/x-www-form-urlencoded",
-    },
-    body: JSON.stringify({x: this.dataset.x, y: this.dataset.y}),
-  })
-
-  const game = await response.json();
-  const content = document.getElementById('page_container');
-  const board = drawBoard(game);
-
-  content.innerHTML = board;
-  addListeners();
+const clickCell = function() {
+  refreshBoard(API.play(1), this.dataset.x, this.dataset.y);
 }
 
 const flagCell = function() {
-  console.log(`FLAGGED ${this.dataset.x}-${this.dataset.y}`);
-  return false;
+  refreshBoard(API.flag(1), this.dataset.x, this.dataset.y);
+}
+
+const refreshBoard = async function(url, x, y) {
+  const response = await Utils.postData(url, {x: x, y: y});
+  const game = await response.json();
+  const content = document.getElementById('page_container');
+
+  content.innerHTML = drawBoard(game);
+  finalAdjustments();
 }
 
 const drawBoard = (game) => {
   return `
       <div id="board"
            onContextMenu="return false"
-           data-width=${game.width}
-           data-height=${game.height} >
-        ${game.board.map(drawCell).join('')}
+           data-state=${ game.state }
+           data-width=${ game.width }
+           data-height=${ game.height } >
+        ${ game.board.map(drawCell).join('') }
       </div>
     `
 }
 
-const addListeners = () => {
-  // Set board widh & height
+const finalAdjustments = () => {
   const board = document.getElementById('board');
-  const size = findSquareSize();
+  const size = Utils.findCellSize();
+
+  // Set board widh & height
   board.style.setProperty('width',  `${ size * board.dataset.width  }px`);
   board.style.setProperty('height', `${ size * board.dataset.height }px`);
 
   // Add event listeners for clicks
-  document.querySelectorAll('.unpressed').forEach((cell) => {
-    cell.addEventListener('click', clickCell);
-    cell.addEventListener('contextmenu', flagCell);
-  });
+  if (board.dataset.state == "started") {
+    document.querySelectorAll('.unpressed:not(.flag)').forEach((cell) => {
+      cell.addEventListener('click', clickCell);
+    });
+    document.querySelectorAll('.unpressed').forEach((cell) => {
+      cell.addEventListener('contextmenu', flagCell);
+    });
+  }
 }
 
 const Home = {
-  render: async () => {
-    const response = await fetch("http://localhost:3000/games/1");
+  render: async ({gameId}) => {
+    const response = await fetch(`/games/${gameId}`);
     const game = await response.json();
 
     return drawBoard(game);
   },
   afterRender: async () => {
-    addListeners();
+    finalAdjustments();
   }
 }
 
