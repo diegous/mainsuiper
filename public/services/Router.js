@@ -1,22 +1,29 @@
-import Login     from '../views/pages/Login.js';
-import GameShow  from '../views/pages/GameShow.js';
-import ListGames from '../views/pages/GameShow.js';
+import Login      from '../views/pages/Login.js';
+import GameShow   from '../views/pages/GameShow.js';
+import GamesIndex from '../views/pages/GamesIndex.js';
+
+import NotFound   from '../views/pages/NotFound.js';
 
 const routes = {
   '/': Login,
+  '/user/games': GamesIndex,
   '/user/games/:gameId:': GameShow,
 }
 
 const routeToRx = (route) => {
-  return RegExp(`^${route}$`                           // regex delimiters
-                  .replace(/:(\w+):/g, '(?<$1>\\d+)')  // find params
-                  .replace(/\//g, '\\/'));             // slash escaping
+  return RegExp(`^${route}\/?$`                    // regex delimiters & optional last '/'
+               .replace(/:(\w+):/g, '(?<$1>\\d+)') // find params
+               .replace(/\//g, '\\/'));            // slash escaping
 }
 
 const findController = (path) => {
-  return Object.entries(routes)
-               .map( ([route, controller]) => [routeToRx(route), controller])
-               .find( ([regx, controller]) => regx.test(path));
+  let result = Object.entries(routes)
+                     .map( ([route, page]) => [routeToRx(route), page] )
+                     .find( ([regx, page]) => regx.test(path) );
+
+  result = result || [/(?:)/, NotFound];
+
+  return result;
 }
 
 const Router = {
@@ -25,7 +32,7 @@ const Router = {
     const [regexp, controller] = findController(currentPath);
     const params = regexp.exec(currentPath).groups;
 
-    return {page: controller, params: params};
+    return { page: controller, params: params };
   }
 }
 

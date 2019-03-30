@@ -1,5 +1,5 @@
 import Utils from '../../services/Utils.js';
-import API   from '../../services/Api.js';
+import API   from '../../services/API.js';
 
 const drawCell = (cell) => {
   let content, classes;
@@ -81,9 +81,9 @@ const finalAdjustments = () => {
   }
 }
 
-const Home = {
+const GameShow = {
   render: async ({gameId}) => {
-    const response = await fetch(`/games/${gameId}`);
+    const response = await fetch(API.game(gameId));
     const game = await response.json();
 
     return drawBoard(game);
@@ -93,4 +93,4 @@ const Home = {
   }
 }
 
-export default Home;
+export default GameShow;

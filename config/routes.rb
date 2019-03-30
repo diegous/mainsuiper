@@ -3,10 +3,12 @@ Rails.application.routes.draw do
 
   # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
 
-  resources :games, only: [:show, :create] do
-    member do
-      post :play
-      post :flag
+  namespace :api do
+    resources :games, only: [:index, :show, :create] do
+      member do
+        post :play
+        post :flag
+      end
     end
   end
 

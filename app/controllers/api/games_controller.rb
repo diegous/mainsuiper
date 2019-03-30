@@ -1,12 +1,20 @@
-class GamesController < ApplicationController
+class Api::GamesController < ApplicationController
   before_action :authenticate_user!
+
+  def index
+    games = current_user.games
+                        .select(:id, :state, :width, :height)
+                        .as_json
+
+    render json: games
+  end
 
   def show
     render json: Game.find(params[:id])
   end
 
   def create
-    game = Game.create user_id: User.first.id,
+    game = Game.create user: current_user,
                        width: params[:width],
                        height: params[:height],
                        bomb_amount: params[:bomb_amount]
@@ -31,7 +39,7 @@ class GamesController < ApplicationController
   private
 
   def game
-    @game ||= Game.find params[:id]
+    @game ||= current_user.games.find params[:id]
   end
 
   def x

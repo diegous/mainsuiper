@@ -21,6 +21,7 @@ class Game < ApplicationRecord
     cell = self.cells[x][y]
     return if cell['pressed']
     return if cell['flagged']
+    return unless started?
 
     cell['pressed'] = true
     flood_neighbors(x,y) if cell['near_bombs'].zero?
@@ -33,9 +34,11 @@ class Game < ApplicationRecord
   end
 
   def flag(x,y)
-    return if self.cells[x][y]['pressed']
+    cell = self.cells[x][y]
+    return unless started?
+    return if cell['pressed']
 
-    self.cells[x][y]['flagged'] = !self.cells[x][y]['flagged']
+    cell['flagged'] = !cell['flagged']
   end
 
   def board

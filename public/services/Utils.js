@@ -17,7 +17,7 @@ const Utils = {
     return Number(size.slice(1, -2));
   },
 
-  renderer: async () => {
+  renderer: async function() {
     const content = document.getElementById('page_container');
     const request = window.location.pathname;
     const {page, params} = Router.getPage();
@@ -26,9 +26,9 @@ const Utils = {
     await page.afterRender();
   },
 
-  redirect: (url) => {
+  redirect: function(url) {
     window.history.pushState(null, '', url);
-    this.renderer();
+    Utils.renderer();
   }
 }
 

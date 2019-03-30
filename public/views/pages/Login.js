@@ -1,5 +1,5 @@
 import Utils from '../../services/Utils.js';
-import API   from '../../services/Api.js';
+import API   from '../../services/API.js';
 
 const loginUser = async () => {
   event.preventDefault();
@@ -15,8 +15,7 @@ const loginUser = async () => {
   const jwt = response.headers.get('Authorization');
 
   if (response.status == 200) {
-    window.history.pushState(null, '', '/user/games/1');
-    Utils.renderer();
+    Utils.redirect('/user/games');
   } else {
     // incorrect credentials
   }
@@ -34,7 +33,7 @@ const Login = {
           <input type="text" name="password" id="password"></input>
           <br/>
 
-          <input type="submit" value="Login"></input>
+          <input type="submit" value="Login" class="btn"></input>
         </form>
       `
   },
