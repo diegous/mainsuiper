@@ -1,7 +1,111 @@
+/*** GLOBAL ***/
+@font-face {
+  font-family: '3dventure';
+  src: url('/fonts/3dventure/3dventure.ttf');
+}
+
+ * {
+  font-family: '3dventure';
+  font-weight: normal;
+  text-align: center;
+  user-select: none;
+  font-size: 1.2rem;
+}
+
+h1 {
+  font-size: 3rem;
+  margin-bottom: 2rem;
+}
+
+h2 {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+}
+
+.btn {
+  border: .1em solid black;
+  background-color: white;
+  box-shadow: -.1em -.1em black;
+  margin: .15em 0 0 .15em;
+}
+
+.btn-container:hover .btn {
+  margin: 0 .15em .15em 0;
+  box-shadow: 0 0 black;
+}
+
+
+/*** Game Index ***/
+.new-game-buttons {
+  display: flex;
+  justify-content: center;
+}
+
+.new-game-buttons .btn-container{
+  margin: .1rem;
+}
+
+.new-game-form-container {
+  display: inline-block;
+}
+
+.new-game-form-container fieldset {
+  border-color: black;
+  display: flex;
+  flex-direction: column;
+}
+
+.new-game-form-container .btn-container {
+  margin: .5em 1.5em 0 1.5em;
+}
+
+#new-game-form input {
+  width: 3em;
+}
+
+.game-list {
+  padding: 0;
+  list-style-type: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.game-list .btn-container {
+  margin-bottom: .2em;
+}
+
+.game-list .btn {
+  width: 11em;
+}
+
+.game-list .game-started {
+  color: dodgerblue;
+}
+
+.game-list .game-won {
+  color: forestgreen;
+}
+
+.game-list .game-lost {
+  color: crimson;
+}
+
+
+/*** BOARD ***/
+
+@font-face {
+  font-family: 'goblin_appears';
+  src: url('/fonts/goblin_appears/goblin_appears.otf');
+}
+
 #board {
+  /* Center the board */
+  margin: auto;
+
   /* Variables */
   --cell-total-size: 30px;
-  --cell-border: 1px;
+  --cell-border: 2px;
   --cell-inner-size: calc(var(--cell-total-size) - calc(2 * var(--cell-border)));
 
   /* Flow for drawing cells */
@@ -14,11 +118,10 @@
   border-color: black;
   border-style: solid;
   border-width: 5px;
-
-  user-select: none;
 }
 
 .item {
+  font-size: .5rem;
   font-weight: bold;
   flex-basis: var(--cell-inner-size);
 
@@ -35,6 +138,8 @@
 }
 
 .pressed {
+  font-family: 'goblin_appears';
+  font-weight: normal;
   background-color: lightgray;
 }
 
@@ -42,10 +147,6 @@
   background-color: gray;
   border-top-color: white;
   border-left-color: white;
-}
-
-.coordinate {
-  width: 2rem;
 }
 
 .pressed-1 {
@@ -61,9 +162,10 @@
 }
 
 .flag {
-  color: red;
+  color: yellow;
 }
 
 .boom {
   background-color: red;
+  font-size: .5rem;
 }
