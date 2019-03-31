@@ -19,7 +19,7 @@ class Api::GamesController < ApplicationController
                        height: params[:height],
                        bomb_amount: params[:bomb_amount]
 
-    render json: game
+    render json: { game_id: game.id }
   end
 
   def play

@@ -3,6 +3,7 @@ export default {
   logout: '/users/sign_out',
 
   gamesList: '/api/games',
+  gameCreate: '/api/games',
   game: id => `/api/games/${id}`,
   play: id => `/api/games/${id}/play`,
   flag: id => `/api/games/${id}/flag`,

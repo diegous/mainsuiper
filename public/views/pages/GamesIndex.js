@@ -5,13 +5,17 @@ const renderForm = () => {
   return `
     <div class="new-game-buttons">
       <div class="btn-container">
-        <button type="button" value="Easy" class="btn">Easy</button>
+        <button type="button" data-height="9" data-width="9" data-bombs="10" class="btn">
+          Easy
+        </button>
       </div>
       <div class="btn-container">
-        <button type="button" value="Medium" class="btn">Medium</button>
+        <button type="button" data-height="16" data-width="16" data-bombs="40" class="btn">
+          Medium
+        </button>
       </div>
       <div class="btn-container">
-        <button type="button" value="Hard" class="btn">Hard </button>
+        <button type="button" data-height="16"  data-width="20" data-bombs="99" class="btn">Hard </button>
       </div>
     </div>
 
@@ -57,6 +61,23 @@ const renderGame = (game) => {
   `;
 }
 
+const startNewGame = async ({width, height, bombs}) => {
+  const params = {
+    width: width,
+    height: height,
+    bomb_amount: bombs
+  };
+
+  const response = await Utils.postData(API.gameCreate, params);
+
+  if (response.status == 200) {
+    const data = await response.json();
+    Utils.redirect(`/user/games/${ data.game_id }`);
+  } else {
+    // something went wrong with request
+  }
+}
+
 const GamesIndex = {
   render: async () => {
     const response = await fetch(API.gamesList);
@@ -73,7 +94,16 @@ const GamesIndex = {
     `;
   },
   afterRender: async () => {
-    document.querySelectorAll('.game-list button').forEach((button) => {
+    // Listeners for New Game buttons
+    document.querySelectorAll('.new-game-buttons button').forEach( button => {
+      button.addEventListener(
+        'click',
+        () => startNewGame(button.dataset)
+      );
+    })
+
+    // Listeners for Finished Games buttons
+    document.querySelectorAll('.game-list button').forEach( button => {
       button.addEventListener(
         'click',
         () => Utils.redirect(`/user/games/${ button.dataset.id }`)

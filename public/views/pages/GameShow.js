@@ -34,11 +34,13 @@ const drawCell = (cell) => {
 
 
 const clickCell = function() {
-  refreshBoard(API.play(1), this.dataset.x, this.dataset.y);
+  const id = document.getElementById('board').dataset.id
+  refreshBoard(API.play(id), this.dataset.x, this.dataset.y);
 }
 
 const flagCell = function() {
-  refreshBoard(API.flag(1), this.dataset.x, this.dataset.y);
+  const id = document.getElementById('board').dataset.id
+  refreshBoard(API.flag(id), this.dataset.x, this.dataset.y);
 }
 
 const refreshBoard = async function(url, x, y) {
@@ -46,15 +48,28 @@ const refreshBoard = async function(url, x, y) {
   const game = await response.json();
   const content = document.getElementById('page_container');
 
-  content.innerHTML = drawBoard(game);
+  content.innerHTML = drawPage(game);
   boardFinalAdjustments();
 }
 
-const drawBoard = (game) => {
+const drawPage = (game) => {
   return `
+      <h2 class="game-${ game.state }">
+        ${ game.state }
+      </h2>
+
+      <div id="back-button">
+        <div class="btn-container">
+          <button type="button" class="btn" id="back-to-games">
+            Back to Games
+          </button>
+        </div>
+      </div>
+
       <span>Total bombs: ${ game.bomb_amount }</span>
       <div id="board"
            onContextMenu="return false"
+           data-id=${ game.id }
            data-state=${ game.state }
            data-width=${ game.width }
            data-height=${ game.height } >
@@ -72,7 +87,8 @@ const boardFinalAdjustments = () => {
   board.style.setProperty('height', `${ size * board.dataset.height }px`);
 
   // Add event listeners for clicks
-  if (board.dataset.state == "started") {
+  const state = board.dataset.state;
+  if (state == "started" || state == "created") {
     document.querySelectorAll('.unpressed:not(.flag)').forEach((cell) => {
       cell.addEventListener('click', clickCell);
     });
@@ -80,6 +96,12 @@ const boardFinalAdjustments = () => {
       cell.addEventListener('contextmenu', flagCell);
     });
   }
+
+  // Back button listener
+  document.getElementById('back-to-games').addEventListener(
+    'click',
+    () => Utils.redirect('/user/games')
+  );
 }
 
 const GameShow = {
@@ -87,30 +109,10 @@ const GameShow = {
     const response = await fetch(API.game(gameId));
     const game = await response.json();
 
-    return `
-        <h2 class="game-${ game.state }">
-          ${ game.state }
-        </h2>
-
-        <div id="back-button">
-          <div class="btn-container">
-            <button type="button" class="btn" id="back-to-games">
-              Back to Games
-            </button>
-          </div>
-        </div>
-
-
-        ${ drawBoard(game) }
-      `
+    return drawPage(game);
   },
   afterRender: async () => {
     boardFinalAdjustments();
-
-    document.getElementById('back-to-games').addEventListener(
-      'click',
-      () => Utils.redirect('/user/games')
-    );
   }
 }
 

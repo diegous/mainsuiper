@@ -83,6 +83,7 @@ h2 {
   width: 11em;
 }
 
+.game-created ,
 .game-started {
   color: dodgerblue;
 }

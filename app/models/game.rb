@@ -18,18 +18,22 @@ class Game < ApplicationRecord
   end
 
   def press(x,y)
-    cell = self.cells[x][y]
-    return if cell['pressed']
-    return if cell['flagged']
-    return unless started?
-
-    cell['pressed'] = true
-    flood_neighbors(x,y) if cell['near_bombs'].zero?
-
-    if cell['bomb']
-      self.state = :lost
+    if created?
+      start x, y
     else
-      check_state
+      cell = self.cells[x][y]
+      return if cell['pressed']
+      return if cell['flagged']
+      return unless started?
+
+      cell['pressed'] = true
+      flood_neighbors(x,y) if cell['near_bombs'].zero?
+
+      if cell['bomb']
+        self.state = :lost
+      else
+        check_state
+      end
     end
   end
 
@@ -42,17 +46,25 @@ class Game < ApplicationRecord
   end
 
   def board
-    value_of = "value_of_#{state}"
+    if created?
+      height.times.to_a.map do |x|
+        width.times.to_a.map do |y|
+          { x: x, y: y, value: '?' }
+        end
+      end.flatten
+    else
+      value_of = "value_of_#{state}"
 
-    self.cells.each_with_index.map do |row, x|
-      row.each_with_index.map do |cell, y|
-        {
-          x: x,
-          y: y,
-          value: send(value_of, cell)
-        }
-      end
-    end.flatten
+      self.cells.each_with_index.map do |row, x|
+        row.each_with_index.map do |cell, y|
+          {
+            x: x,
+            y: y,
+            value: send(value_of, cell)
+          }
+        end
+      end.flatten
+    end
   end
 
   private
@@ -159,7 +171,7 @@ class Game < ApplicationRecord
       # Only bombs remain unpressed
       only_bombs = cells.flatten
                         .reject { |cell| cell['pressed'] }
-                        .none? { |cell| cell['bomb'] }
+                        .all? { |cell| cell['bomb'] }
 
       self.state = :won if only_bombs
     end
