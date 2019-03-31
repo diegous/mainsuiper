@@ -1,7 +1,7 @@
 const NotFound = {
   render: async () => {
     return `
-      <h1>404</h1>
+      <h2>404</h2>
     `;
   },
   afterRender: async () => {
