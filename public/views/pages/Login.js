@@ -17,7 +17,7 @@ const loginUser = async () => {
   if (response.status == 200) {
     Utils.redirect('/user/games');
   } else {
-    // incorrect credentials
+    alert('Incorrect username or password');
   }
 }
 
@@ -33,13 +33,14 @@ const Login = {
           <input type="text" name="password" id="password"></input>
           <br/>
 
-          <input type="submit" value="Login" class="btn"></input>
+          <div class="btn-container">
+            <button type="button" class="btn">Login</button>
+          </div>
         </form>
       `
   },
   afterRender: () => {
-    const form = document.getElementById('login-form');
-    form.addEventListener('submit', () => loginUser(form), false);
+    document.querySelector('button').addEventListener('click', loginUser);
   }
 }
 
