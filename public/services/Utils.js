@@ -1,4 +1,5 @@
 import Router from '../services/Router.js';
+import Header from '../views/shared/Header.js';
 
 const Utils = {
   postData: (url, data = {}) => {
@@ -18,6 +19,9 @@ const Utils = {
   },
 
   renderer: async function() {
+    const header = document.getElementById('header_container');
+    header.innerHTML = await Header.render();
+
     const content = document.getElementById('page_container');
     const request = window.location.pathname;
     const {page, params} = Router.getPage();
