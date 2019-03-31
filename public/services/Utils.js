@@ -1,5 +1,6 @@
 import Router from '../services/Router.js';
 import Header from '../views/shared/Header.js';
+import Footer from '../views/shared/Footer.js';
 
 const Utils = {
   postData: (url, data = {}) => {
@@ -19,15 +20,21 @@ const Utils = {
   },
 
   renderer: async function() {
+    // Header
     const header = document.getElementById('header_container');
     header.innerHTML = await Header.render();
 
+    // Body
     const content = document.getElementById('page_container');
     const request = window.location.pathname;
     const {page, params} = Router.getPage();
 
     content.innerHTML = await page.render(params);
     await page.afterRender();
+
+    // Footer
+    const footer = document.getElementById('footer_container');
+    footer.innerHTML = await Footer.render();
   },
 
   redirect: function(url) {
