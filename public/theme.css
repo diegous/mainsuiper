@@ -35,7 +35,11 @@ h2 {
 }
 
 
-/*** Game Index ***/
+
+
+/****************************/
+/******** Game Index ********/
+/****************************/
 .new-game-buttons {
   display: flex;
   justify-content: center;
@@ -79,20 +83,32 @@ h2 {
   width: 11em;
 }
 
-.game-list .game-started {
+.game-started {
   color: dodgerblue;
 }
 
-.game-list .game-won {
+.game-won {
   color: forestgreen;
 }
 
-.game-list .game-lost {
+.game-lost {
   color: crimson;
 }
 
 
-/*** BOARD ***/
+
+
+/***************************/
+/******** Game Show ********/
+/***************************/
+
+#back-button {
+  margin: 1rem;
+  display: flex;
+  flex-direction: column;
+}
+
+/*** Board ***/
 
 @font-face {
   font-family: 'goblin_appears';

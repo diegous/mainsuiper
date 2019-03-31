@@ -47,11 +47,12 @@ const refreshBoard = async function(url, x, y) {
   const content = document.getElementById('page_container');
 
   content.innerHTML = drawBoard(game);
-  finalAdjustments();
+  boardFinalAdjustments();
 }
 
 const drawBoard = (game) => {
   return `
+      <span>Total bombs: ${ game.bomb_amount }</span>
       <div id="board"
            onContextMenu="return false"
            data-state=${ game.state }
@@ -62,7 +63,7 @@ const drawBoard = (game) => {
     `
 }
 
-const finalAdjustments = () => {
+const boardFinalAdjustments = () => {
   const board = document.getElementById('board');
   const size = Utils.findCellSize();
 
@@ -86,10 +87,30 @@ const GameShow = {
     const response = await fetch(API.game(gameId));
     const game = await response.json();
 
-    return drawBoard(game);
+    return `
+        <h2 class="game-${ game.state }">
+          ${ game.state }
+        </h2>
+
+        <div id="back-button">
+          <div class="btn-container">
+            <button type="button" class="btn" id="back-to-games">
+              Back to Games
+            </button>
+          </div>
+        </div>
+
+
+        ${ drawBoard(game) }
+      `
   },
   afterRender: async () => {
-    finalAdjustments();
+    boardFinalAdjustments();
+
+    document.getElementById('back-to-games').addEventListener(
+      'click',
+      () => Utils.redirect('/user/games')
+    );
   }
 }
 
