@@ -45,6 +45,20 @@ class Game < ApplicationRecord
     cell['flagged'] = !cell['flagged']
   end
 
+  def reveal(x,y)
+    cell = self.cells[x][y]
+    return unless started?
+    return unless cell['pressed']
+    return if cell['near_bombs'] == 0
+
+    neighbors = neighbors_of(x,y)
+    near_flags = neighbors.count { |x, y| cells[x][y]['flagged'] }
+
+    if near_flags == cell['near_bombs']
+      neighbors.each { |x,y| press(x,y) }
+    end
+  end
+
   def board
     if created?
       height.times.to_a.map do |x|

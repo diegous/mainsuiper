@@ -7,4 +7,5 @@ export default {
   game: id => `/api/games/${id}`,
   play: id => `/api/games/${id}/play`,
   flag: id => `/api/games/${id}/flag`,
+  reveal: id => `/api/games/${id}/reveal`,
 };

@@ -36,6 +36,13 @@ class Api::GamesController < ApplicationController
     render json: game
   end
 
+  def reveal
+    game.reveal(x, y)
+    game.save
+
+    render json: game
+  end
+
   private
 
   def game

@@ -21,9 +21,13 @@ const drawCell = (cell) => {
       classes = 'pressed boom';
       content = '<i class="fas fa-bomb"></i>';
       break;
+    case 0:
+      classes = 'pressed';
+      content = '';
+      break;
     default:
-      classes = `pressed pressed-${cell.value}`;
-      content = cell.value > 0 ? cell.value : '';
+      classes = `pressed pressed-${cell.value} number`;
+      content = cell.value;
   }
 
   const datas = `data-x=${cell.x}
@@ -41,6 +45,11 @@ const clickCell = function() {
 const flagCell = function() {
   const id = document.getElementById('board').dataset.id
   refreshBoard(API.flag(id), this.dataset.x, this.dataset.y);
+}
+
+const clickNumber = function() {
+  const id = document.getElementById('board').dataset.id
+  refreshBoard(API.reveal(id), this.dataset.x, this.dataset.y);
 }
 
 const refreshBoard = async function(url, x, y) {
@@ -94,6 +103,9 @@ const boardFinalAdjustments = () => {
     });
     document.querySelectorAll('.unpressed').forEach((cell) => {
       cell.addEventListener('contextmenu', flagCell);
+    });
+    document.querySelectorAll('.number').forEach((cell) => {
+      cell.addEventListener('click', clickNumber);
     });
   }
 
