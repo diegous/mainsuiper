@@ -61,8 +61,8 @@ class Game < ApplicationRecord
 
   def board
     if created?
-      height.times.to_a.map do |x|
-        width.times.to_a.map do |y|
+      width.times.to_a.map do |x|
+        height.times.to_a.map do |y|
           { x: x, y: y, value: '?' }
         end
       end.flatten
