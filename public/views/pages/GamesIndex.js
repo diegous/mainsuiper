@@ -54,7 +54,7 @@ const renderGame = (game) => {
           <span class="game-${ game.state }">
             ${ game.state }
           </span>
-          - ${ game.height } by ${ game.height }
+          - ${ game.width } by ${ game.height }
         </button>
       </div>
     </li>
