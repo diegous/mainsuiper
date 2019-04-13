@@ -4,6 +4,11 @@
   src: url('/fonts/3dventure/3dventure.ttf');
 }
 
+@font-face {
+  font-family: 'retro_gaming';
+  src: url('/fonts/retro_gaming/retro_gaming.ttf');
+}
+
  * {
   font-family: '3dventure';
   font-weight: normal;
@@ -34,7 +39,9 @@ h2 {
   box-shadow: 0 0 black;
 }
 
-
+.retro-gaming {
+  font-family: 'retro_gaming';
+}
 
 
 
@@ -45,6 +52,14 @@ h2 {
   display: flex;
   flex-flow: column;
   align-items: center;
+}
+
+#login-form label {
+  font-size: 2rem;
+}
+
+#login-form input {
+  font-size: 1rem;
 }
 
 

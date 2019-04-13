@@ -26,11 +26,11 @@ const Login = {
     return `
         <form id="login-form">
           <label for="email">Email</label>
-          <input type="text" name="email" id="email"></input>
+          <input type="text" name="email" id="email" class="retro-gaming"></input>
           <br/>
 
           <label for="password">Password</label>
-          <input type="text" name="password" id="password"></input>
+          <input type="password" name="password" id="password" class="retro-gaming"></input>
           <br/>
 
           <div class="btn-container">
