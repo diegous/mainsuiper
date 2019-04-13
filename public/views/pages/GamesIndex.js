@@ -97,7 +97,7 @@ const GamesIndex = {
       <h2>New Game</h2>
       ${ renderForm() }
 
-      <h2>Finished Games</h2>
+      <h2>Old Games</h2>
       <ul class="game-list">
         ${ games.map(renderGame).join('') }
       </ul>
