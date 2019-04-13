@@ -111,6 +111,15 @@ class Game < ApplicationRecord
     # create bombs at random spots, but not on cliked cell
     self.cells[clicked_x][clicked_y]['bomb'] = true
 
+    # try to avoid putting bomb in surrounding cells
+    neighbors = neighbors_of(clicked_x, clicked_y)
+    free_cells = width * height - bomb_amount
+
+    if free_cells >= (neighbors.count + 1)
+      neighbors.each { |x,y| self.cells[x][y]['bomb'] = true }
+    end
+
+    # place bombs
     bomb_amount.times do
       begin
         x = rand width
@@ -120,7 +129,13 @@ class Game < ApplicationRecord
       self.cells[x][y]['bomb'] = true
     end
 
+    # remove clicked cell's bomb
     self.cells[clicked_x][clicked_y]['bomb'] = false
+
+    # and remove from neighbors if necessary
+    if free_cells >= (neighbors.count + 1)
+      neighbors.each { |x,y| self.cells[x][y]['bomb'] = false }
+    end
   end
 
   def calculate_numbers
