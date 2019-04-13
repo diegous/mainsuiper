@@ -61,6 +61,16 @@ const renderGame = (game) => {
   `;
 }
 
+const newCustomGame = () => {
+  const params = {
+    width: document.getElementById('width').value,
+    height: document.getElementById('height').value,
+    bombs: document.getElementById('bombs').value
+  }
+
+  startNewGame(params);
+}
+
 const startNewGame = async ({width, height, bombs}) => {
   const params = {
     width: width,
@@ -109,6 +119,10 @@ const GamesIndex = {
         () => Utils.redirect(`/user/games/${ button.dataset.id }`)
       );
     });
+
+    // Listeners for Custom Game button
+    document.querySelector('#new-game-form button')
+            .addEventListener('click', newCustomGame);
   }
 }
 
