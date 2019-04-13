@@ -1,7 +1,7 @@
 const Header = {
   render: async () => {
     return `
-      <h1>Minesweeper</h1>
+      <h1>Mainsuiper</h1>
     `;
   },
   afterRender: async () => {
