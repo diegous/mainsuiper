@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_03_12_225218) do
+ActiveRecord::Schema.define(version: 2019_04_14_061931) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -24,6 +24,8 @@ ActiveRecord::Schema.define(version: 2019_03_12_225218) do
     t.jsonb "cells", array: true
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "flag_count"
+    t.integer "pressed_count"
     t.index ["user_id"], name: "index_games_on_user_id"
   end
 

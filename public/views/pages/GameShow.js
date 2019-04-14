@@ -75,7 +75,7 @@ const drawPage = (game) => {
         </div>
       </div>
 
-      <span>Total bombs: ${ game.bomb_amount }</span>
+      <span>Flaggs: ${ game.flag_count || 0 } / ${ game.bomb_amount }</span>
       <div id="board"
            onContextMenu="return false"
            data-id=${ game.id }

@@ -8,6 +8,8 @@ class Game < ApplicationRecord
   before_create :set_created
 
   def start(x, y)
+    self.pressed_count = 0
+    self.flag_count = 0
     self.state = :started
     self.cells = Array.new(width) { Array.new height, { 'near_bombs' => 0 } }
 
@@ -21,10 +23,10 @@ class Game < ApplicationRecord
     if created?
       start x, y
     else
-      cell = self.cells[x][y]
+      return unless started?
+      cell = cells[x][y]
       return if cell['pressed']
       return if cell['flagged']
-      return unless started?
 
       cell['pressed'] = true
       flood_neighbors(x,y) if cell['near_bombs'].zero?
@@ -32,17 +34,24 @@ class Game < ApplicationRecord
       if cell['bomb']
         self.state = :lost
       else
+        self.pressed_count += 1
         check_state
       end
     end
   end
 
   def flag(x,y)
-    cell = self.cells[x][y]
     return unless started?
+    cell = self.cells[x][y]
     return if cell['pressed']
 
-    cell['flagged'] = !cell['flagged']
+    if cell['flagged']
+      self.flag_count -= 1
+      cell['flagged'] = false
+    else
+      self.flag_count += 1
+      cell['flagged'] = true
+    end
   end
 
   def reveal(x,y)
@@ -157,9 +166,12 @@ class Game < ApplicationRecord
   def flood_neighbors(x,y)
     neighbors = neighbors_of(x,y)
 
-    neighbors.map    { |x,y|      [x, y, self.cells[x][y]] }
-             .reject { |x,y,cell| cell['pressed']          }
-             .each   { |x,y,cell| cell['pressed'] = true   }
+    unpressed = neighbors.map    { |x,y|      [x, y, self.cells[x][y]] }
+                         .reject { |x,y,cell| cell['pressed']          }
+
+    self.pressed_count += unpressed.count
+
+    unpressed.each   { |x,y,cell| cell['pressed'] = true   }
              .select { |x,y,cell| cell['near_bombs'].zero? }
              .each   { |x,y,cell| flood_neighbors(x,y)     }
   end
@@ -189,20 +201,10 @@ class Game < ApplicationRecord
   end
 
   def check_state
-    # No bombs pressed
-    bomb_pressed = cells.flatten
-                        .select { |cell| cell['bomb'] }
-                        .any? { |cell| cell['pressed'] }
+    non_bomb_cell_amount = width * height - bomb_amount
 
-    if bomb_pressed
-      self.state = :lost
-    else
-      # Only bombs remain unpressed
-      only_bombs = cells.flatten
-                        .reject { |cell| cell['pressed'] }
-                        .all? { |cell| cell['bomb'] }
-
-      self.state = :won if only_bombs
+    if pressed_count == non_bomb_cell_amount
+      self.state = :won
     end
   end
 
