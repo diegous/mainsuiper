@@ -29,12 +29,12 @@ class Game < ApplicationRecord
       return if cell['flagged']
 
       cell['pressed'] = true
-      flood_neighbors(x,y) if cell['near_bombs'].zero?
+      self.pressed_count += 1
 
       if cell['bomb']
         self.state = :lost
       else
-        self.pressed_count += 1
+        flood_neighbors(x,y) if cell['near_bombs'].zero?
         check_state
       end
     end
