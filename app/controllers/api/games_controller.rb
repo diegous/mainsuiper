@@ -1,5 +1,6 @@
 class Api::GamesController < ApplicationController
   before_action :authenticate_user!
+  rescue_from Games::OutOfBoundriesError, with: :out_of_bounds
 
   def index
     games = current_user.games
@@ -23,24 +24,27 @@ class Api::GamesController < ApplicationController
   end
 
   def play
-    game.press(x, y)
-    game.save
+    game_service = Games::PlayService.new(game)
+    game_service.press(x,y)
+    game_service.save
 
-    render json: game
+    render json: game_service.game
   end
 
   def flag
-    game.flag(x, y)
-    game.save
+    game_service = Games::PlayService.new(game)
+    game_service.flag(x,y)
+    game_service.save
 
-    render json: game
+    render json: game_service.game
   end
 
   def reveal
-    game.reveal(x, y)
-    game.save
+    game_service = Games::PlayService.new(game)
+    game_service.reveal(x,y)
+    game_service.save
 
-    render json: game
+    render json: game_service.game
   end
 
   private
@@ -55,5 +59,9 @@ class Api::GamesController < ApplicationController
 
   def y
     @y ||= params[:y].to_i
+  end
+
+  def out_of_bounds
+    render json: { error: 'coordinates out of bounds' }
   end
 end

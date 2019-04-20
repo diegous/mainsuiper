@@ -14,34 +14,28 @@ class Game < ApplicationRecord
     self.cells = Array.new(width) { Array.new height, { 'near_bombs' => 0 } }
 
     generate_bombs(x,y)
-    calculate_numbers
+    calculate_near_bombs
 
     press x, y
   end
 
   def press(x,y)
-    if created?
-      start x, y
+    cell = cells[x][y]
+    return if cell['pressed']
+    return if cell['flagged']
+
+    cell['pressed'] = true
+    self.pressed_count += 1
+
+    if cell['bomb']
+      self.state = :lost
     else
-      return unless started?
-      cell = cells[x][y]
-      return if cell['pressed']
-      return if cell['flagged']
-
-      cell['pressed'] = true
-      self.pressed_count += 1
-
-      if cell['bomb']
-        self.state = :lost
-      else
-        flood_neighbors(x,y) if cell['near_bombs'].zero?
-        check_state
-      end
+      flood_neighbors(x,y) if cell['near_bombs'].zero?
+      check_state
     end
   end
 
   def flag(x,y)
-    return unless started?
     cell = self.cells[x][y]
     return if cell['pressed']
 
@@ -56,7 +50,6 @@ class Game < ApplicationRecord
 
   def reveal(x,y)
     cell = self.cells[x][y]
-    return unless started?
     return unless cell['pressed']
     return if cell['near_bombs'] == 0
 
@@ -68,53 +61,7 @@ class Game < ApplicationRecord
     end
   end
 
-  def board
-    if created?
-      width.times.to_a.map do |x|
-        height.times.to_a.map do |y|
-          { x: x, y: y, value: '?' }
-        end
-      end.flatten
-    else
-      value_of = "value_of_#{state}"
-
-      self.cells.each_with_index.map do |row, x|
-        row.each_with_index.map do |cell, y|
-          {
-            x: x,
-            y: y,
-            value: send(value_of, cell)
-          }
-        end
-      end.flatten
-    end
-  end
-
   private
-
-  def value_of_won(cell)
-    cell['bomb'] ? 'flag' : cell['near_bombs']
-  end
-
-  def value_of_lost(cell)
-    if cell['pressed']
-      cell['bomb'] ? 'BOOM' : cell['near_bombs']
-    elsif cell['flags']
-      cell['bomb'] ? 'flag' : 'wrong flag'
-    else
-      cell['bomb'] ? 'bomb' : '?'
-    end
-  end
-
-  def value_of_started(cell)
-    if cell['pressed']
-      cell['near_bombs']
-    elsif cell['flagged']
-      'flag'
-    else
-      '?'
-    end
-  end
 
   def generate_bombs(clicked_x, clicked_y)
     # create bombs at random spots, but not on cliked cell
@@ -122,9 +69,9 @@ class Game < ApplicationRecord
 
     # try to avoid putting bomb in surrounding cells
     neighbors = neighbors_of(clicked_x, clicked_y)
-    free_cells = width * height - bomb_amount
+    free_cells_amount = width * height - bomb_amount
 
-    if free_cells >= (neighbors.count + 1)
+    if free_cells_amount > neighbors.count
       neighbors.each { |x,y| self.cells[x][y]['bomb'] = true }
     end
 
@@ -142,13 +89,13 @@ class Game < ApplicationRecord
     self.cells[clicked_x][clicked_y]['bomb'] = false
 
     # and remove from neighbors if necessary
-    if free_cells >= (neighbors.count + 1)
+    if free_cells_amount >= (neighbors.count + 1)
       neighbors.each { |x,y| self.cells[x][y]['bomb'] = false }
     end
   end
 
-  def calculate_numbers
-    self.cells.each_with_index do |row, x|
+  def calculate_near_bombs
+    cells.each_with_index do |row, x|
       row.each_with_index do |cell, y|
         increment_neighbours_of(x,y) if cell['bomb']
       end
@@ -166,14 +113,14 @@ class Game < ApplicationRecord
   def flood_neighbors(x,y)
     neighbors = neighbors_of(x,y)
 
-    unpressed = neighbors.map    { |x,y|      [x, y, self.cells[x][y]] }
-                         .reject { |x,y,cell| cell['pressed']          }
+    pressed = neighbors.map    { |x,y|      [x, y, self.cells[x][y]] }
+                       .reject { |x,y,cell| cell['pressed']          }
+                       .each   { |x,y,cell| cell['pressed'] = true   }
 
-    self.pressed_count += unpressed.count
+    self.pressed_count += pressed.count
 
-    unpressed.each   { |x,y,cell| cell['pressed'] = true   }
-             .select { |x,y,cell| cell['near_bombs'].zero? }
-             .each   { |x,y,cell| flood_neighbors(x,y)     }
+    pressed.select { |x,y,cell| cell['near_bombs'].zero? }
+           .each   { |x,y,cell| flood_neighbors(x,y)     }
   end
 
   def neighbors_of(x,y)
