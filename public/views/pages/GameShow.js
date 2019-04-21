@@ -21,6 +21,10 @@ const drawCell = (cell) => {
       classes = 'pressed boom';
       content = '<i class="fas fa-bomb"></i>';
       break;
+    case 'wrong flag':
+      classes = 'pressed red-x';
+      content = '<i class="fas fa-bomb"></i>';
+      break;
     case 0:
       classes = 'pressed';
       content = '';

@@ -32,7 +32,7 @@ class GameSerializer < ActiveModel::Serializer
   def value_of_lost(cell)
     if cell['pressed']
       cell['bomb'] ? 'BOOM' : cell['near_bombs']
-    elsif cell['flags']
+    elsif cell['flagged']
       cell['bomb'] ? 'flag' : 'wrong flag'
     else
       cell['bomb'] ? 'bomb' : '?'

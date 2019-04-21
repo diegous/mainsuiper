@@ -216,3 +216,10 @@ h2 {
   background-color: red;
   font-size: .5rem;
 }
+
+.red-x:before {
+  position: absolute;
+  content: '✕';
+  font-size: 1.5rem;
+  color: red;
+}
