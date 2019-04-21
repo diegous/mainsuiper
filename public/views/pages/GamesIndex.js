@@ -15,7 +15,7 @@ const renderForm = () => {
         </button>
       </div>
       <div class="btn-container">
-        <button type="button" data-height="16"  data-width="20" data-bombs="99" class="btn">Hard </button>
+        <button type="button" data-height="16"  data-width="30" data-bombs="99" class="btn">Hard </button>
       </div>
     </div>
 
