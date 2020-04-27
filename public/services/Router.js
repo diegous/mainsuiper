@@ -1,4 +1,5 @@
 import Login      from '../views/pages/Login.js';
+import Signup     from '../views/pages/Signup.js';
 import GameShow   from '../views/pages/GameShow.js';
 import GamesIndex from '../views/pages/GamesIndex.js';
 
@@ -6,6 +7,7 @@ import NotFound   from '../views/pages/NotFound.js';
 
 const routes = {
   '/': Login,
+  '/signup': Signup,
   '/user/games': GamesIndex,
   '/user/games/:gameId:': GameShow,
 }

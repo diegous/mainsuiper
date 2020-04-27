@@ -34,13 +34,21 @@ const Login = {
           <br/>
 
           <div class="btn-container">
-            <button type="button" class="btn">Login</button>
+            <button id="login" type="button" class="btn">Login</button>
+          </div>
+
+          <div class="btn-container">
+            <button id="signup" type="button" class="btn">Signup</button>
           </div>
         </form>
       `
   },
   afterRender: () => {
-    document.querySelector('button').addEventListener('click', loginUser);
+    document.getElementById('login').addEventListener('click', loginUser);
+    document.getElementById('signup').addEventListener(
+      'click',
+      () => Utils.redirect('/signup')
+    );
   }
 }
 

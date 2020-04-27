@@ -2,6 +2,8 @@ export default {
   login: '/users/sign_in',
   logout: '/users/sign_out',
 
+  signup: '/users',
+
   gamesList: '/api/games',
   gameCreate: '/api/games',
   game: id => `/api/games/${id}`,
