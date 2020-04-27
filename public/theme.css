@@ -136,6 +136,14 @@ h2 {
   color: crimson;
 }
 
+.controls-container {
+  margin: auto;
+  max-width: 30rem;
+}
+
+.controls-container h4, .controls-container li {
+  text-align: left;
+}
 
 
 

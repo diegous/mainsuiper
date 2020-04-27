@@ -88,6 +88,20 @@ const drawPage = (game) => {
            data-height=${ game.height } >
         ${ game.board.map(drawCell).join('') }
       </div>
+
+      <fieldset class="controls-container">
+        <legend>Controls</legend>
+        <h4>Unclicked cell:</h4>
+        <ul>
+          <li>Right click: discover cell</li>
+          <li>Left click: (un)flag cell</li>
+        </ul>
+
+        <h4>Clicked cell:</h4>
+        <ul>
+          <li>Left click: discover neighbors</li>
+        </ul>
+      </fieldset>
     `
 }
 
