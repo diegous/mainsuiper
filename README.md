@@ -10,3 +10,5 @@ You can try it out [here](http://mainsuiper.herokuapp.com/)
 - Add page history tracking (back forward browser buttons don't work)
 - Add tests
 - Change backend and frontend routes. They are quite ugly.
+- Add a timer
+- Update gems with vulnerabilities (reported by GitHub)
